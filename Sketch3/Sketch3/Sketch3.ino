@@ -10,7 +10,7 @@ List Team Members Here:
 Team 5
 1.Marc Bordoy
 2.Kyle Bennett
-3.Jonathan 
+3.Jonathan Altieri
 4.
 
 NOTES:
