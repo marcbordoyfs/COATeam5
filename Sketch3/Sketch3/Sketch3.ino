@@ -150,6 +150,9 @@ Sets target number, heading and distance on NeoPixel Display
 void setNeoPixel(uint8_t target, float heading, float distance)
 {
 	// add code here
+
+
+
 }
 
 #endif	// NEO_ON
