@@ -60,11 +60,12 @@ int LEDSafeIndex(int index)
 
 void Indicator::UpdateDisplay(int HeadingDegrees, int DistanceInFeet)
 {
+	HeadingDegrees -= 180;
 	int16_t Headingdif = CurrHeading - HeadingDegrees;
 	int16_t NewHeading = -1;
 	if (Headingdif > 30 || Headingdif < 30);
 	{
-		NewHeading = map(HeadingDegrees, 0, 360, 0, 16);
+		NewHeading = map(HeadingDegrees, 360, 0, 0, 16);
 		CurrHeading = map(NewHeading, 0, 16, 0, 360);
 	}
 	int16_t Mindist = 1;

@@ -1,10 +1,8 @@
 #pragma once
-static class GPSMath
+class GPSMath
 {
 public:
-	GPSMath();
-	~GPSMath();
-static float GetDistanceInFeet(float Lat1, float Lon1, float Lat2, float Lon2);
-static float GetHeading(float Lat1, float Lon1, float Lat2, float Lon2);
+static float GetDistanceInFeet(float PosLat, float PosLon, float TarLat, float TarLon);
+static float GetHeading(float PosLat, float PosLon, float TarLat, float TarLon, float CurrentHeadinginDegrees, bool HemisphereModifier);
 };
 
