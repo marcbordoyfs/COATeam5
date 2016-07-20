@@ -286,7 +286,17 @@ int main(void)
 	float distance = 0.0, heading = 0.0;
 
 	init();
-
+	pinMode(10, OUTPUT);
+	Serial.begin(115200);
+	if (SD.begin(SD_CHIP_SELECT_PIN))
+	{
+		Serial.println("Card Failure");
+	}
+	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
+	if (datafile)
+	{
+		datafile.println(cstr);
+	}
 	// init target button
 
 #if TRM_ON
@@ -313,19 +323,14 @@ int main(void)
 	chars in length (excluding the ".txt").
 	*/
 
-	pinMode(53,OUTPUT);
+	pinMode(10,OUTPUT);
 	Serial.begin(115200);
-	if(SD.begin(53))
+	if(SD.begin(SD_CHIP_SELECT_PIN))
 	{
 		Serial.println("Card Failure");
-		return;
 	}
 	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
-	if (datafile)
-	{
-		datafile.println("stuff");
-		datafile.close();
-	}
+
 
 
 #endif
@@ -356,7 +361,10 @@ int main(void)
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
-
+			if (datafile)
+			{
+				datafile.println(cstr);
+			}
 #endif
 
 			break;
