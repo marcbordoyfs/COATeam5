@@ -60,6 +60,8 @@ A               // Mode A=Autonomous D=differential E=Estimated
 ******************************************************************************/
 
 // Required
+#include <LABLibrary.h>
+#include <SD.h>
 #include <Adafruit_NeoPixel.h>
 #include "Arduino.h"
 
@@ -293,10 +295,14 @@ int main(void)
 
 #if ONE_ON
 	// init OneShield Shield
+
+
 #endif
 
 #if NEO_ON
 	// init NeoPixel Shield
+
+
 #endif	
 
 #if SDC_ON
@@ -306,6 +312,22 @@ int main(void)
 	sequential number of the file.  The filename can not be more than 8
 	chars in length (excluding the ".txt").
 	*/
+
+	pinMode(53,OUTPUT);
+	Serial.begin(115200);
+	if(SD.begin(53))
+	{
+		Serial.println("Card Failure");
+		return;
+	}
+	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
+	if (datafile)
+	{
+		datafile.println("stuff");
+		datafile.close();
+	}
+
+
 #endif
 
 	// enable GPS sending GPRMC message
@@ -334,6 +356,7 @@ int main(void)
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
+
 #endif
 
 			break;
