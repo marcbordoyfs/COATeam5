@@ -30,7 +30,7 @@ float GPSMath::GetDistanceInFeet(float PosLat, float PosLon, float TarLat, float
 
 float GetDegreestoPoint(float PosLatRads, float PosLonRads, float TarLatRads, float TarLonRads)
 {
-	float deg = atan2(sin(TarLonRads - PosLonRads) * cos(TarLatRads), cos(PosLatRads) * sin(TarLatRads) - sin(PosLatRads) * cos(TarLatRads) * cos(TarLonRads - PosLonRads)) * 2 * Pi;
+	float deg = atan2(sin(TarLonRads - PosLonRads) * cos(TarLatRads), cos(PosLatRads) * sin(TarLatRads) - sin(PosLatRads) * cos(TarLatRads) * cos(TarLonRads - PosLonRads));// *2 * Pi;
 	deg = deg * 180 / Pi;
 	return deg;
 }
@@ -51,9 +51,10 @@ float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon
 
 	Degreestopoint -= CurrentHeadinginDegrees;
 
-	if (HemisphereModifier)
+	if (Degreestopoint < 0)
 	{
-		Degreestopoint *= -1;
+		Degreestopoint += 360;
 	}
+
 	return Degreestopoint;
 }

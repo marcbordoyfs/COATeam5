@@ -25,22 +25,22 @@ void Indicator::Initialize()
 	CurrHeading = 500;
 	CurrentDistanceLevel = 1;
 #pragma region LED Array Initialization
-	RadialLEDs[0] = 23;
-	RadialLEDs[1] = 15;
-	RadialLEDs[2] = 7;
-	RadialLEDs[3] = 6;
-	RadialLEDs[4] = 5;
-	RadialLEDs[5] = 4;
-	RadialLEDs[6] = 3;
-	RadialLEDs[7] = 11;
-	RadialLEDs[8] = 19;
-	RadialLEDs[9] = 27;
-	RadialLEDs[10] = 35;
-	RadialLEDs[11] = 36;
-	RadialLEDs[12] = 37;
-	RadialLEDs[13] = 38;
-	RadialLEDs[14] = 39;
-	RadialLEDs[15] = 31;
+	RadialLEDs[0] = 31;
+	RadialLEDs[1] = 39;
+	RadialLEDs[2] = 38;
+	RadialLEDs[3] = 37;
+	RadialLEDs[4] = 36;
+	RadialLEDs[5] = 35;
+	RadialLEDs[6] = 27;
+	RadialLEDs[7] = 19;
+	RadialLEDs[8] = 11;
+	RadialLEDs[9] = 3;	
+	RadialLEDs[10] = 4;	
+	RadialLEDs[11] = 5;
+	RadialLEDs[12] = 6;
+	RadialLEDs[13] = 7;
+	RadialLEDs[14] = 15;	
+	RadialLEDs[15] = 23;
 #pragma endregion
 }
 
@@ -60,12 +60,11 @@ int LEDSafeIndex(int index)
 
 void Indicator::UpdateDisplay(int HeadingDegrees, int DistanceInFeet)
 {
-	HeadingDegrees -= 180;
 	int16_t Headingdif = CurrHeading - HeadingDegrees;
 	int16_t NewHeading = -1;
-	if (Headingdif > 30 || Headingdif < 30);
+	if (Headingdif > 20 || Headingdif < 20);
 	{
-		NewHeading = map(HeadingDegrees, 360, 0, 0, 16);
+		NewHeading = map(HeadingDegrees, 0, 360, 0, 16);
 		CurrHeading = map(NewHeading, 0, 16, 0, 360);
 	}
 	int16_t Mindist = 1;
