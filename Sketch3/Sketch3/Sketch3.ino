@@ -10,7 +10,7 @@ List Team Members Here:
 Team 5
 1.Marc Bordoy
 2.Kyle Bennett
-3.Jonathan 
+3.Jonathan Altieri
 4.
 
 NOTES:
@@ -60,6 +60,8 @@ A               // Mode A=Autonomous D=differential E=Estimated
 ******************************************************************************/
 
 // Required
+#include <LABLibrary.h>
+#include <SD.h>
 #include <Adafruit_NeoPixel.h>
 #include "Arduino.h"
 
@@ -150,6 +152,9 @@ Sets target number, heading and distance on NeoPixel Display
 void setNeoPixel(uint8_t target, float heading, float distance)
 {
 	// add code here
+
+
+
 }
 
 #endif	// NEO_ON
@@ -281,7 +286,17 @@ int main(void)
 	float distance = 0.0, heading = 0.0;
 
 	init();
-
+	pinMode(10, OUTPUT);
+	Serial.begin(115200);
+	if (SD.begin(SD_CHIP_SELECT_PIN))
+	{
+		Serial.println("Card Failure");
+	}
+	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
+	if (datafile)
+	{
+		datafile.println(cstr);
+	}
 	// init target button
 
 #if TRM_ON
@@ -290,10 +305,14 @@ int main(void)
 
 #if ONE_ON
 	// init OneShield Shield
+
+
 #endif
 
 #if NEO_ON
 	// init NeoPixel Shield
+
+
 #endif	
 
 #if SDC_ON
@@ -303,6 +322,17 @@ int main(void)
 	sequential number of the file.  The filename can not be more than 8
 	chars in length (excluding the ".txt").
 	*/
+
+	pinMode(10,OUTPUT);
+	Serial.begin(115200);
+	if(SD.begin(SD_CHIP_SELECT_PIN))
+	{
+		Serial.println("Card Failure");
+	}
+	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
+
+
+
 #endif
 
 	// enable GPS sending GPRMC message
@@ -331,6 +361,10 @@ int main(void)
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
+			if (datafile)
+			{
+				datafile.println(cstr);
+			}
 #endif
 
 			break;
