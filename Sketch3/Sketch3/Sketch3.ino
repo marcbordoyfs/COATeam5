@@ -407,7 +407,7 @@ int main(void)
 			//Serial.println(mode);
 			char* checksum = strtok(NULL, " /r/n ");
 			//Serial.println(checksum);
-
+			Serial.println(checksum);
 #if SDC_ON
 			// write current position to SecureDigital then flush
 				datafile.println(cstr);
