@@ -9,13 +9,14 @@ class Indicator
 	int16_t CurrHeading;
 	int8_t CurrentDistanceLevel;
 	int8_t RadialLEDs[16];
+	void LEDActivateByDistance(int HeadingCenterLED, int DistanceInFeet);
 public:
 	Indicator();
 	~Indicator();
 	void Initialize();
 	void UpdateDisplay(int HeadingDegrees, int DistanceInFeet);
-	void LEDActivateByDistance(int HeadingCenterLED, int DistanceInFeet);
 	void WipeLEDs();
+	void SetTargetLight(int target);
 #if IdentifyingLEDs
 	void ActivateLED(int LED);
 	int NeopixelLEDcount();

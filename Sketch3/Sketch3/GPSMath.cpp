@@ -30,12 +30,12 @@ float GPSMath::GetDistanceInFeet(float PosLat, float PosLon, float TarLat, float
 
 float GetDegreestoPoint(float PosLatRads, float PosLonRads, float TarLatRads, float TarLonRads)
 {
-	float deg = atan2(sin(TarLonRads - PosLonRads) * cos(TarLatRads), cos(PosLatRads) * sin(TarLatRads) - sin(PosLatRads) * cos(TarLatRads) * cos(TarLonRads - PosLonRads)) * 2 * Pi;
+	float deg = atan2(sin(TarLonRads - PosLonRads) * cos(TarLatRads), cos(PosLatRads) * sin(TarLatRads) - sin(PosLatRads) * cos(TarLatRads) * cos(TarLonRads - PosLonRads));// *2 * Pi;
 	deg = deg * 180 / Pi;
 	return deg;
 }
 
-float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon, float CurrentHeadinginDegrees, bool HemisphereModifier)
+float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon, float CurrentHeadinginDegrees)
 {
 	float PosLatRads = radians(PosLat);
 	float TarLatRads = radians(TarLat);
@@ -51,9 +51,28 @@ float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon
 
 	Degreestopoint -= CurrentHeadinginDegrees;
 
-	if (HemisphereModifier)
+	if (Degreestopoint < 0)
 	{
-		Degreestopoint *= -1;
+		Degreestopoint += 360;
 	}
+
 	return Degreestopoint;
+}
+
+void GPSMath::DegreesMinutesToDecimalDegreesConversion(float & Latitude, float & Longitude, bool SouthernHemisphere, bool WesternHemisphere)
+{
+	int8_t latdegrees = Latitude / 100;
+	int8_t londegrees = Longitude / 100;
+	Latitude -= latdegrees;
+	Longitude -= londegrees;
+	Latitude = latdegrees + Latitude / 60;
+	Longitude = londegrees + Longitude / 60;
+	if (SouthernHemisphere)
+	{
+		Latitude *= -1;
+	}
+	if (WesternHemisphere)
+	{
+		Longitude *= -1;
+	}
 }
