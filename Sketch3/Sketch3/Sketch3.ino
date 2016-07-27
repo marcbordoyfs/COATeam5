@@ -108,7 +108,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(40, NEO_TX, NEO_GRB + NEO_KHZ800);
 #endif
 
 #if SDC_ON
-#include "SecureDigital.h"
+#include "SD.h"
 #endif
 
 /*
@@ -266,7 +266,20 @@ void getGPSMessage(void)
 }
 
 #endif	// GPS_ON
+bool Debounce(int pin)
+{
 
+	for (int i = 0; i < 1000; i++)
+	{
+
+		if (digitalRead(pin) == 1)
+		{
+			return false;
+		}
+
+	}
+	return true;
+}
 /*
 Main Program Entry
 
@@ -281,23 +294,22 @@ false
 */
 int main(void)
 {
+
+	bool current;
+	bool previous;
 	// variables
 	uint8_t target = 0;
 	float distance = 0.0, heading = 0.0;
+	bool current;
+	bool previous;
 
 	init();
-	pinMode(10, OUTPUT);
-	Serial.begin(115200);
-	if (SD.begin(SD_CHIP_SELECT_PIN))
-	{
-		Serial.println("Card Failure");
-	}
-	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
-	if (datafile)
-	{
-		datafile.println(cstr);
-	}
+
 	// init target button
+	pinMode(2, INPUT);
+	bool pressed = false;
+
+
 
 #if TRM_ON
 	Serial.begin(115200);
@@ -346,7 +358,18 @@ int main(void)
 	while (true)
 	{
 		// if button pressed, set new target
+		previous = current;
+		current = Debounce(2);
+		if (current == true && digitalRead(2))
+		{
+			Serial.print("Target: ");
+			Serial.println(target);
 
+			target++;
+			if (target >= 4)
+				target = 0;
+
+		}
 		// returns with message once a second
 		getGPSMessage();
 
@@ -354,17 +377,42 @@ int main(void)
 		while (cstr[3] == 'R')
 		{
 			// parse message parameters
-
-			// calculated destination heading
-
-			// calculated destination distance
+			Serial.println(cstr);
+			// parse message parameters
+			char* message = strtok(cstr, " , ");
+			//Serial.println(message);
+			char* time = strtok(NULL, " , ");
+			//Serial.println(time);
+			char* valid = strtok(NULL, " , ");
+			Serial.println(valid);
+			char* latitude = strtok(NULL, " , ");
+			//Serial.println(latitude);
+			char* latIndicator = strtok(NULL, " , ");
+			Serial.println(latIndicator);
+			char* longitude = strtok(NULL, " , ");
+			//Serial.println(longitude);
+			char* longIndicator = strtok(NULL, " , ");
+			Serial.println(longIndicator);
+			char* speed = strtok(NULL, " , ");
+			//Serial.println(speed);
+			char* course = strtok(NULL, " , ");
+			//Serial.println(course);
+			char* date = strtok(NULL, " , ");
+			//Serial.println(date);
+			char* variation = strtok(NULL, " , ");
+			//Serial.println(variation);
+			char* EorW = strtok(NULL, " , ");
+			//Serial.println(EorW);
+			char* mode = strtok(NULL, " * ");
+			//Serial.println(mode);
+			char* checksum = strtok(NULL, " /r/n ");
+			//Serial.println(checksum);
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
-			if (datafile)
-			{
 				datafile.println(cstr);
-			}
+				Serial.println("Did a thing");
+
 #endif
 
 			break;
