@@ -1,3 +1,13 @@
+#define Latitude0 0.0
+#define Latitude1 0.0
+#define Latitude2 0.0
+#define Latitude3 0.0
+
+#define Longitude0 0.0
+#define Longitude1 0.0
+#define Longitude2 0.0
+#define Longitude3 0.0
+
 /******************************************************************************
 
 GeoCache Hunt Project (GeoCache.cpp)
@@ -60,10 +70,11 @@ A               // Mode A=Autonomous D=differential E=Estimated
 ******************************************************************************/
 
 // Required
-#include <LABLibrary.h>
+//#include <LABLibrary.h>
 #include <SD.h>
 #include <Adafruit_NeoPixel.h>
 #include "Arduino.h"
+#include "GPSMath.h"
 
 /*
 Configuration settings.
@@ -75,10 +86,10 @@ all these libraries at the same time.  You are only permitted to
 have NEO_ON, GPS_ON and SDC_ON during the actual GeoCache Treasure
 Hunt.
 */
-#define NEO_ON 0		// NeoPixelShield
+#define NEO_ON 1		// NeoPixelShield
 #define TRM_ON 1		// SerialTerminal
 #define ONE_ON 0		// 1Sheeld
-#define SDC_ON 0		// SecureDigital
+#define SDC_ON 1		// SecureDigital
 #define GPS_ON 1		// GPSShield (off = simulated)
 
 // define pin usage
@@ -97,8 +108,9 @@ SoftwareSerial gps(GPS_RX, GPS_TX);
 
 // library includes
 #if NEO_ON
-#include "NeoPixel.h"
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(40, NEO_TX, NEO_GRB + NEO_KHZ800);
+#include "Indicator.h"
+#include "Adafruit_NeoPixel-master\Adafruit_NeoPixel.h"
+Indicator strip;
 #endif
 
 #if ONE_ON
@@ -152,8 +164,8 @@ Sets target number, heading and distance on NeoPixel Display
 void setNeoPixel(uint8_t target, float heading, float distance)
 {
 	// add code here
-
-
+	strip.UpdateDisplay(heading, distance);
+	strip.SetTargetLight(target);
 
 }
 
@@ -280,6 +292,38 @@ bool Debounce(int pin)
 	}
 	return true;
 }
+
+float TargetLatitude(int target)
+{
+	switch (target)
+	{
+	case 0:
+		return Latitude0;
+	case 1:
+		return Latitude1;
+	case 2:
+		return Latitude2;
+	case 3:
+		return Latitude3;
+	}
+	return 0;
+}
+float TargetLongitude(int target)
+{
+	switch (target)
+	{
+	case 0:
+		return Longitude0;
+	case 1:
+		return Longitude1;
+	case 2:
+		return Longitude2;
+	case 3:
+		return Longitude3;
+	}
+	return 0;
+}
+
 /*
 Main Program Entry
 
@@ -300,9 +344,7 @@ int main(void)
 	// variables
 	uint8_t target = 0;
 	float distance = 0.0, heading = 0.0;
-	bool current;
-	bool previous;
-
+	strip.Initialize();
 	init();
 
 	// init target button
@@ -335,12 +377,12 @@ int main(void)
 	chars in length (excluding the ".txt").
 	*/
 
-	pinMode(10,OUTPUT);
+	pinMode(10, OUTPUT);
 	Serial.begin(115200);
-	if(SD.begin(SD_CHIP_SELECT_PIN))
+	if (SD.begin(SD_CHIP_SELECT_PIN))
 	{
 		Serial.println("Card Failure");
-	}
+}
 	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
 
 
@@ -374,53 +416,86 @@ int main(void)
 		getGPSMessage();
 
 		// if GPRMC message (3rd letter = R)
+		float latitude;
+		float longitude;
+		float course;
+		char LatIndicator;
+		char LonIndicator;
 		while (cstr[3] == 'R')
 		{
 			// parse message parameters
 			Serial.println(cstr);
 			// parse message parameters
-			char* message = strtok(cstr, " , ");
-			//Serial.println(message);
+			{
+				char* message = strtok(cstr, " , ");
+				//Serial.println(message);
+				//Scope eliminates unnecessary variable to free room.
+			}
 			char* time = strtok(NULL, " , ");
 			//Serial.println(time);
-			char* valid = strtok(NULL, " , ");
-			Serial.println(valid);
-			char* latitude = strtok(NULL, " , ");
+			{
+				char* valid = strtok(NULL, " , ");
+				Serial.println(valid);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			char* latitudestring = strtok(NULL, " , ");
 			//Serial.println(latitude);
 			char* latIndicator = strtok(NULL, " , ");
 			Serial.println(latIndicator);
-			char* longitude = strtok(NULL, " , ");
+			char* longitudestring = strtok(NULL, " , ");
 			//Serial.println(longitude);
 			char* longIndicator = strtok(NULL, " , ");
 			Serial.println(longIndicator);
-			char* speed = strtok(NULL, " , ");
-			//Serial.println(speed);
-			char* course = strtok(NULL, " , ");
+			{
+				char* speed = strtok(NULL, " , ");
+				//Serial.println(speed);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			char* coursestring = strtok(NULL, " , ");
 			//Serial.println(course);
 			char* date = strtok(NULL, " , ");
 			//Serial.println(date);
-			char* variation = strtok(NULL, " , ");
-			//Serial.println(variation);
-			char* EorW = strtok(NULL, " , ");
-			//Serial.println(EorW);
-			char* mode = strtok(NULL, " * ");
-			//Serial.println(mode);
-			char* checksum = strtok(NULL, " /r/n ");
-			//Serial.println(checksum);
-
+			{
+				char* variation = strtok(NULL, " , ");
+				//Serial.println(variation);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			{
+				char* EorW = strtok(NULL, " , ");
+				//Serial.println(EorW);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			{
+				char* mode = strtok(NULL, " * ");
+				//Serial.println(mode);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			{
+				char* checksum = strtok(NULL, " /r/n ");
+				//Serial.println(checksum);
+				//Scope eliminates unnecessary variable to free room.
+			}
+			LatIndicator = latIndicator[0];
+			LonIndicator = longIndicator[0];
+			latitude = atof(latitudestring);
+			longitude = atof(longitudestring);
+			course = atof(coursestring);
 #if SDC_ON
 			// write current position to SecureDigital then flush
-				datafile.println(cstr);
-				Serial.println("Did a thing");
+			datafile.println(cstr);
+			Serial.println("Did a thing");
 
 #endif
 
 			break;
-		}
-
-		// set NeoPixel target display
+			}
+		//Do math
+		GPSMath::DegreesMinutesToDecimalDegreesConversion(latitude, longitude, (LatIndicator == 'S'), (LonIndicator == 'W'));
+		distance = GPSMath::GetDistanceInFeet(latitude, longitude, TargetLatitude(target), TargetLongitude(target));
+		heading = GPSMath::GetHeading(latitude,longitude,TargetLatitude(target),TargetLatitude(target),course);
+			// set NeoPixel target display
 #if NEO_ON
-		setNeoPixel(target, heading, distance);
+			setNeoPixel(target, heading, distance);
 #endif		
 
 #if TRM_ON
@@ -432,7 +507,7 @@ int main(void)
 		// print debug information to OneSheeld Terminal
 		if (serialEventRun) serialEventRun();
 #endif		
-	}
+		}
 
 	return(false);
-}
+	}

@@ -20,7 +20,7 @@ void Indicator::Initialize()
 {
 	Neopixel = Adafruit_NeoPixel(60, NEOPIXELPIN, NEO_GRB + NEO_KHZ800);
 	Neopixel.begin();
-	Neopixel.setBrightness(3);
+	Neopixel.setBrightness(20);
 	Neopixel.show();
 	CurrHeading = 500;
 	CurrentDistanceLevel = 1;
@@ -205,6 +205,25 @@ void Indicator::WipeLEDs()
 	Neopixel.clear();
 	Neopixel.show();
 	}
+
+void Indicator::SetTargetLight(int target)
+{
+	switch (target)
+	{
+	case 0:
+		Neopixel.setPixelColor(0, COLORGREEN);
+		break;
+	case 1:
+		Neopixel.setPixelColor(8, COLORGREEN);
+		break;
+	case 2:
+		Neopixel.setPixelColor(16, COLORGREEN);
+		break;
+	case 3:
+		Neopixel.setPixelColor(24, COLORGREEN);
+		break;
+	}
+}
 
 #if IdentifyingLEDs
 

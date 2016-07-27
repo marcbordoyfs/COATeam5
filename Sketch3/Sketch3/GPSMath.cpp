@@ -35,7 +35,7 @@ float GetDegreestoPoint(float PosLatRads, float PosLonRads, float TarLatRads, fl
 	return deg;
 }
 
-float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon, float CurrentHeadinginDegrees, bool HemisphereModifier)
+float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon, float CurrentHeadinginDegrees)
 {
 	float PosLatRads = radians(PosLat);
 	float TarLatRads = radians(TarLat);
