@@ -351,11 +351,9 @@ int main(void)
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
-			if (datafile)
-			{
 				datafile.println(cstr);
 				Serial.println("Did a thing");
-			}
+
 #endif
 
 			break;
