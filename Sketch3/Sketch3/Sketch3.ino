@@ -108,7 +108,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(40, NEO_TX, NEO_GRB + NEO_KHZ800);
 #endif
 
 #if SDC_ON
-#include "SecureDigital.h"
+#include "SD.h"
 #endif
 
 /*
@@ -304,17 +304,7 @@ int main(void)
 	bool previous;
 
 	init();
-	pinMode(10, OUTPUT);
-	Serial.begin(115200);
-	if (SD.begin(SD_CHIP_SELECT_PIN))
-	{
-		Serial.println("Card Failure");
-	}
-	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
-	if (datafile)
-	{
-		datafile.println(cstr);
-	}
+
 	// init target button
 	pinMode(2, INPUT);
 	bool pressed = false;
@@ -420,10 +410,9 @@ int main(void)
 
 #if SDC_ON
 			// write current position to SecureDigital then flush
-			if (datafile)
-			{
 				datafile.println(cstr);
-			}
+				Serial.println("Did a thing");
+
 #endif
 
 			break;
