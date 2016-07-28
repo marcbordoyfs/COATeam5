@@ -1,9 +1,9 @@
-#define Latitude0 0.0
+#define Latitude0 28.594728
 #define Latitude1 0.0
 #define Latitude2 0.0
 #define Latitude3 0.0
 
-#define Longitude0 0.0
+#define Longitude0 -81.304999
 #define Longitude1 0.0
 #define Longitude2 0.0
 #define Longitude3 0.0
@@ -280,15 +280,12 @@ void getGPSMessage(void)
 #endif	// GPS_ON
 bool Debounce(int pin)
 {
-
 	for (int i = 0; i < 1000; i++)
 	{
-
 		if (digitalRead(pin) == 1)
 		{
 			return false;
 		}
-
 	}
 	return true;
 }
@@ -397,18 +394,19 @@ void loop()
 {
 
 	// if button pressed, set new target
-	previous = current;
-	current = Debounce(theswitch);
-	if (current == true && digitalRead(theswitch))
-	{
-		Serial.print("Target: ");
-		Serial.println(target);
+//	previous = current;
+//	current = Debounce(theswitch);
 
-		target++;
-		if (target >= 4)
-			target = 0;
+	if (digitalRead(theswitch) == 0 && Debounce(theswitch))
+		{
+			Serial.print("Target: ");
+			Serial.println(target);
 
-	}
+			target++;
+			if (target >= 4)
+				target = 0;
+
+		}
 	// returns with message once a second
 	getGPSMessage();
 
@@ -481,6 +479,9 @@ void loop()
 		GPSMath::DegreesMinutesToDecimalDegreesConversion(latitude, longitude, (LatIndicator == 'S'), (LonIndicator == 'W'));
 		distance = GPSMath::GetDistanceInFeet(latitude, longitude, TargetLatitude(target), TargetLongitude(target));
 		heading = GPSMath::GetHeading(latitude, longitude, TargetLatitude(target), TargetLatitude(target), course);
+		Serial.println(latitude);
+		Serial.println(longitude);
+		Serial.println(distance);
 
 #if SDC_ON
 		// write current position to SecureDigital then flush

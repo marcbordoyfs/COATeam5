@@ -129,6 +129,8 @@ void Indicator::UpdateDisplay(int HeadingDegrees, int DistanceInFeet)
 		CurrentDistanceLevel -= 1;
 		DistChange = true;
 	}
+	if (CurrentDistanceLevel > 9)
+		CurrentDistanceLevel = 9;
 	if (DistChange || NewHeading >= -1)
 	{
 		Neopixel.clear();
@@ -224,6 +226,7 @@ void Indicator::SetTargetLight(int target)
 		Neopixel.setPixelColor(24, COLORGREEN);
 		break;
 	}
+	Neopixel.show();
 }
 
 #if IdentifyingLEDs

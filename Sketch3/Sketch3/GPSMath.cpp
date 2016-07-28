@@ -61,10 +61,12 @@ float GPSMath::GetHeading(float PosLat, float PosLon, float TarLat, float TarLon
 
 void GPSMath::DegreesMinutesToDecimalDegreesConversion(float & Latitude, float & Longitude, bool SouthernHemisphere, bool WesternHemisphere)
 {
+	Serial.println("Printing unmodified longitude");
+	Serial.println(Longitude);
 	int8_t latdegrees = Latitude / 100;
 	int8_t londegrees = Longitude / 100;
-	Latitude -= latdegrees;
-	Longitude -= londegrees;
+	Latitude -= latdegrees * 100;
+	Longitude -= londegrees * 100;
 	Latitude = latdegrees + Latitude / 60;
 	Longitude = londegrees + Longitude / 60;
 	if (SouthernHemisphere)
