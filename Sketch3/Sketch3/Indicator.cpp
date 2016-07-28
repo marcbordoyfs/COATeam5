@@ -42,10 +42,6 @@ void Indicator::Initialize()
 	RadialLEDs[14] = 15;	
 	RadialLEDs[15] = 23;
 
-	for (int u; u < 16; ++u)
-		Neopixel.setPixelColor(RadialLEDs[u], COLORGREEN);
-	Neopixel.show();
-
 #pragma endregion
 }
 
