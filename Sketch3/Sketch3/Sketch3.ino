@@ -155,7 +155,7 @@ These are GPS command messages (only a few are used).
 #define PMTK_SET_NMEA_OUTPUT_OFF "$PMTK314,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*28"
 
 #endif // GPS_ON
-
+#define theswitch 2
 #if NEO_ON
 
 /*
@@ -308,6 +308,7 @@ float TargetLatitude(int target)
 	}
 	return 0;
 }
+
 float TargetLongitude(int target)
 {
 	switch (target)
@@ -336,37 +337,33 @@ Return:
 false
 
 */
-int main(void)
+
+bool current;
+bool previous;
+uint8_t target = 0;
+float distance = 0.0, heading = 0.0;
+File datafile;
+
+void setup()
 {
 
-	bool current;
-	bool previous;
 	// variables
-	uint8_t target = 0;
-	float distance = 0.0, heading = 0.0;
-	strip.Initialize();
 	init();
 
 	// init target button
-	pinMode(2, INPUT);
+	pinMode(theswitch, INPUT_PULLUP);
 	bool pressed = false;
 
 
 
 #if TRM_ON
-	Serial.begin(115200);
+	Serial.begin(9600);
 #endif	
-
-#if ONE_ON
-	// init OneShield Shield
-
-
-#endif
 
 #if NEO_ON
 	// init NeoPixel Shield
-
-
+	// pinMode(6, OUTPUT);
+	strip.Initialize();
 #endif	
 
 #if SDC_ON
@@ -377,15 +374,11 @@ int main(void)
 	chars in length (excluding the ".txt").
 	*/
 
-	pinMode(10, OUTPUT);
-	Serial.begin(115200);
+	pinMode(SD_CHIP_SELECT_PIN, OUTPUT);
 	if (SD.begin(SD_CHIP_SELECT_PIN))
 	{
 		Serial.println("Card Failure");
-}
-	File datafile = SD.open("MyMapNN.txt", FILE_WRITE);
-
-
+	}
 
 #endif
 
@@ -397,117 +390,133 @@ int main(void)
 	gps.println(PMTK_SET_NMEA_OUTPUT_RMC);
 #endif	
 
-	while (true)
+}
+
+
+void loop()
+{
+
+	// if button pressed, set new target
+	previous = current;
+	current = Debounce(theswitch);
+	if (current == true && digitalRead(theswitch))
 	{
-		// if button pressed, set new target
-		previous = current;
-		current = Debounce(2);
-		if (current == true && digitalRead(2))
+		Serial.print("Target: ");
+		Serial.println(target);
+
+		target++;
+		if (target >= 4)
+			target = 0;
+
+	}
+	// returns with message once a second
+	getGPSMessage();
+
+	// if GPRMC message (3rd letter = R)
+	float latitude;
+	float longitude;
+	float course;
+	char LatIndicator;
+	char LonIndicator;
+	while (cstr[3] == 'R')
+	{
+		// parse message parameters
+		Serial.println(cstr);
+		// parse message parameters
 		{
-			Serial.print("Target: ");
-			Serial.println(target);
-
-			target++;
-			if (target >= 4)
-				target = 0;
-
+			char* message = strtok(cstr, " , ");
+			//Serial.println(message);
+			//Scope eliminates unnecessary variable to free room.
 		}
-		// returns with message once a second
-		getGPSMessage();
-
-		// if GPRMC message (3rd letter = R)
-		float latitude;
-		float longitude;
-		float course;
-		char LatIndicator;
-		char LonIndicator;
-		while (cstr[3] == 'R')
+		char* time = strtok(NULL, " , ");
+		//Serial.println(time);
 		{
-			// parse message parameters
-			Serial.println(cstr);
-			// parse message parameters
-			{
-				char* message = strtok(cstr, " , ");
-				//Serial.println(message);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			char* time = strtok(NULL, " , ");
-			//Serial.println(time);
-			{
-				char* valid = strtok(NULL, " , ");
-				Serial.println(valid);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			char* latitudestring = strtok(NULL, " , ");
-			//Serial.println(latitude);
-			char* latIndicator = strtok(NULL, " , ");
-			Serial.println(latIndicator);
-			char* longitudestring = strtok(NULL, " , ");
-			//Serial.println(longitude);
-			char* longIndicator = strtok(NULL, " , ");
-			Serial.println(longIndicator);
-			{
-				char* speed = strtok(NULL, " , ");
-				//Serial.println(speed);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			char* coursestring = strtok(NULL, " , ");
-			//Serial.println(course);
-			char* date = strtok(NULL, " , ");
-			//Serial.println(date);
-			{
-				char* variation = strtok(NULL, " , ");
-				//Serial.println(variation);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			{
-				char* EorW = strtok(NULL, " , ");
-				//Serial.println(EorW);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			{
-				char* mode = strtok(NULL, " * ");
-				//Serial.println(mode);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			{
-				char* checksum = strtok(NULL, " /r/n ");
-				//Serial.println(checksum);
-				//Scope eliminates unnecessary variable to free room.
-			}
-			LatIndicator = latIndicator[0];
-			LonIndicator = longIndicator[0];
-			latitude = atof(latitudestring);
-			longitude = atof(longitudestring);
-			course = atof(coursestring);
+			char* valid = strtok(NULL, " , ");
+			Serial.println(valid);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		char* latitudestring = strtok(NULL, " , ");
+		//Serial.println(latitude);
+		char* latIndicator = strtok(NULL, " , ");
+		Serial.println(latIndicator);
+		char* longitudestring = strtok(NULL, " , ");
+		//Serial.println(longitude);
+		char* longIndicator = strtok(NULL, " , ");
+		Serial.println(longIndicator);
+		{
+			char* speed = strtok(NULL, " , ");
+			//Serial.println(speed);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		char* coursestring = strtok(NULL, " , ");
+		//Serial.println(course);
+		char* date = strtok(NULL, " , ");
+		//Serial.println(date);
+		{
+			char* variation = strtok(NULL, " , ");
+			//Serial.println(variation);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		{
+			char* EorW = strtok(NULL, " , ");
+			//Serial.println(EorW);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		{
+			char* mode = strtok(NULL, " * ");
+			//Serial.println(mode);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		{
+			char* checksum = strtok(NULL, " /r/n ");
+			//Serial.println(checksum);
+			//Scope eliminates unnecessary variable to free room.
+		}
+		LatIndicator = latIndicator[0];
+		LonIndicator = longIndicator[0];
+		latitude = atof(latitudestring);
+		longitude = atof(longitudestring);
+		course = atof(coursestring);
+
+		GPSMath::DegreesMinutesToDecimalDegreesConversion(latitude, longitude, (LatIndicator == 'S'), (LonIndicator == 'W'));
+		distance = GPSMath::GetDistanceInFeet(latitude, longitude, TargetLatitude(target), TargetLongitude(target));
+		heading = GPSMath::GetHeading(latitude, longitude, TargetLatitude(target), TargetLatitude(target), course);
+
 #if SDC_ON
-			// write current position to SecureDigital then flush
-			datafile.println(cstr);
-			Serial.println("Did a thing");
+		// write current position to SecureDigital then flush
+		datafile = SD.open("MyMapNN.txt", FILE_WRITE);
+		if (datafile)
+		{
+
+			datafile.print(longitude,6);
+			datafile.print(" , " );
+			datafile.print(latitude, 6);
+			datafile.print(" , ");
+			datafile.println(distance,6);
+			Serial.println("Card Sucses");
+			datafile.flush();
+			datafile.close();
+		}
+		else
+			Serial.println("\nCouldn't open the log file!");
+
 
 #endif
 
-			break;
-			}
-		//Do math
-		GPSMath::DegreesMinutesToDecimalDegreesConversion(latitude, longitude, (LatIndicator == 'S'), (LonIndicator == 'W'));
-		distance = GPSMath::GetDistanceInFeet(latitude, longitude, TargetLatitude(target), TargetLongitude(target));
-		heading = GPSMath::GetHeading(latitude,longitude,TargetLatitude(target),TargetLatitude(target),course);
-			// set NeoPixel target display
+		break;
+	}
+
+	//Do math
+
+
+	// set NeoPixel target display
 #if NEO_ON
-			setNeoPixel(target, heading, distance);
+	setNeoPixel(target, heading, distance);
 #endif		
 
 #if TRM_ON
-		// print debug information to Serial Terminal
-		Serial.println(cstr);
+	// print debug information to Serial Terminal
+	Serial.println(cstr);
 #endif		
 
-#if ONE_ON
-		// print debug information to OneSheeld Terminal
-		if (serialEventRun) serialEventRun();
-#endif		
-		}
-
-	return(false);
-	}
+}

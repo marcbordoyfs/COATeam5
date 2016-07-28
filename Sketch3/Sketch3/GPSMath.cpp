@@ -12,9 +12,9 @@ float LinearDistance(float Latdist, float Londist, float PosLat, float TarLat)
 	flatdist2 *= sin(Londist * 0.5f);
 	flatdist2 *= sin(Londist * 0.5f);
 	flatdist1 += flatdist2;
-	flatdist1 = (2 * atan2(sqrt(flatdist1), sqrt(1 - flatdist2)));
+	flatdist1 = (2 * atan2(sqrt(flatdist1), sqrt(1 - flatdist2)));	// 1 - flatdist1
 	flatdist1 *= 6371000.0;
-	flatdist1 *= 3;
+	flatdist1 *= 3.2808;
 	return flatdist1;
 }
 
